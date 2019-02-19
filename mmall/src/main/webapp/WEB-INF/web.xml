@@ -42,7 +42,7 @@
     <servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <!-- >=0立刻容器初始化servlet  <0 使用时初始化>
+        <!--  <load-on-startup> = 0立刻容器初始化servlet  <load-on-startup><0 使用时初始化 -->
         <load-on-startup>1</load-on-startup>
     </servlet>
 
