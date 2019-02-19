@@ -37,6 +37,7 @@ public class ProductController {
 
     @RequestMapping(value = "update_product_status.do",method = RequestMethod.POST)
     @ResponseBody
+    
     public ResponseContent<String> update_product_status(HttpSession session, int productId,int status){
         User user = (User) session.getAttribute(Const.CURRENT_USER.getName());
         if(user == null){
