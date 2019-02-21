@@ -62,7 +62,7 @@ public class CategoryController {
             return  ResponseContent.createByErrorWithCM(ReturnCode.LOGIN.getCode(),"用户未登陆");
         }
         if(user.getRole() != Role.ADMIN.getCode()){
-            return ResponseContent.createByErrorWithMsg("不是管理员不能获取品类");
+            return ResponseContent.createByErrorWithMsg("不是管理员不能搜索品类");
         }
         return iCaregoryService.getParallelChildrenCategory(parentId);
     }
