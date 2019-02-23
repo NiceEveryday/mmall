@@ -22,10 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/backend/product")
-public class ProductController {
+public class ProductManagerController {
 
     @Autowired
     private IProductService iProductService;
@@ -69,7 +71,7 @@ public class ProductController {
         if(user.getRole() != Role.ADMIN.getCode()){
             return ResponseContent.createByErrorWithMsg("不是管理员不能更新商品状态");
         }
-        return  iProductService.detail(productId);
+        return  iProductService.detail(productId,false);
     }
 
     @RequestMapping(value = "list.do",method = RequestMethod.GET)
@@ -102,7 +104,7 @@ public class ProductController {
 
     @RequestMapping(value = "img_load.do",method = RequestMethod.POST)
     @ResponseBody
-    public ResponseContent<String> img_load(HttpSession session,@RequestParam(value = "multipartFile") MultipartFile multipartFile, HttpServletRequest httpRequest){
+    public ResponseContent<Map> img_load(HttpSession session, @RequestParam(value = "multipartFile") MultipartFile multipartFile, HttpServletRequest httpRequest){
         User user = (User) session.getAttribute(Const.CURRENT_USER.getName());
         if(user == null){
             return  ResponseContent.createByErrorWithCM(ReturnCode.LOGIN.getCode(),"用户未登陆");
@@ -116,8 +118,40 @@ public class ProductController {
             return ResponseContent.createByErrorWithMsg("图片上传失败,请重试");
         }
         String url = PropertiesUtil.getProperty("ftp.server.http.prefix","") + imgName;
-        return  ResponseContent.createBySuccessWithMD("上传成功",url);
+
+        Map map = new HashMap();
+        map.put("uri",imgName);
+        map.put("url",url);
+        return  ResponseContent.createBySuccessWithMD("上传成功",map);
     }
 
+    @RequestMapping(value = "editor_img_load.do",method = RequestMethod.POST)
+    @ResponseBody
+    public Map editor_img_load(HttpSession session, @RequestParam(value = "multipartFile") MultipartFile multipartFile, HttpServletRequest httpRequest){
+        Map map = new HashMap();
+        User user = (User) session.getAttribute(Const.CURRENT_USER.getName());
+        if(user == null){
+            map.put("success",false);
+            map.put("msg","请登录管理员");
+            return  map;
+        }
+        if(user.getRole() != Role.ADMIN.getCode()){
+            map.put("success",false);
+            map.put("msg","无权限");
+            return  map;
+        }
+        String path = httpRequest.getSession().getServletContext().getRealPath("upload");
+        String imgName =  iFileService.uploadImg(multipartFile,path);
+        if(StringUtils.isBlank(imgName)){
+            map.put("success",false);
+            map.put("msg","图片上传失败");
+            return  map;
+        }
+        String url = PropertiesUtil.getProperty("ftp.server.http.prefix","") + imgName;
+        map.put("success",true);
+        map.put("msg","图片上传成功");
+        map.put("file_path",url);
+        return  map;
+    }
 
 }

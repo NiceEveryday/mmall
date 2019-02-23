@@ -8,7 +8,8 @@ import com.mmall.vo.ProductDetailVO;
 public interface IProductService {
     ResponseContent<String> saveOrUpdateProduct(Product product);
     ResponseContent<String> updateProductStatus(int productId,int status);
-    ResponseContent<ProductDetailVO> detail(Integer productId);
+    ResponseContent<ProductDetailVO> detail(Integer productId,boolean isFront);
     ResponseContent<PageInfo> list(Integer pageNum, Integer pageSize);
     ResponseContent<PageInfo>  search(String productName,Integer productId,int pageNum,int pageSize);
+    ResponseContent<PageInfo>  listFront(Integer categoryId,String keyword,Integer pageNum,Integer pageSize,String orderBy);
 }

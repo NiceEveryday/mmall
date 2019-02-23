@@ -197,5 +197,27 @@
     </where>
   </select>
 
+  <select id="selectByCategoryIdAndKeyword" resultMap="BaseResultMap" parameterType="map">
+    select <include refid="Base_Column_List"></include>
+    from mmall_product
+    <where>
+      <if test="keyword != null">
+            and name like CONCAT('%',#{keyword},'%')
+      </if>
+      <if test="list != null">
+            and category_id IN
+            <foreach collection="list" index="index" open="(" separator="," close=")" item="item">
+              #{item}
+            </foreach>
+      </if>
+      <if test="status != null">
+            and status = #{status}
+      </if>
+    </where>
+
+  </select>
+
+
+
 
 </mapper>

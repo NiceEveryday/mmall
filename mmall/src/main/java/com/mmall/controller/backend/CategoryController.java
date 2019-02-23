@@ -6,7 +6,7 @@ import com.mmall.common.ReturnCode;
 import com.mmall.common.Role;
 import com.mmall.pojo.Category;
 import com.mmall.pojo.User;
-import com.mmall.service.ICaregoryService;
+import com.mmall.service.ICategoryService;
 import com.mmall.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,7 +26,7 @@ public class CategoryController {
     private IUserService iUserService;
 
     @Autowired
-    private ICaregoryService iCaregoryService;
+    private ICategoryService iCategoryService;
 
     @RequestMapping(value = "addCategory.do",method = RequestMethod.POST)
     @ResponseBody
@@ -38,7 +38,7 @@ public class CategoryController {
         if(user.getRole() != Role.ADMIN.getCode()){
             return ResponseContent.createByErrorWithMsg("不是管理员不能添加品类");
         }
-        return iCaregoryService.addCategory(categoryName,parentId);
+        return iCategoryService.addCategory(categoryName,parentId);
     }
 
     @RequestMapping(value = "updateCategory.do",method = RequestMethod.POST)
@@ -51,7 +51,7 @@ public class CategoryController {
         if(user.getRole() != Role.ADMIN.getCode()){
             return ResponseContent.createByErrorWithMsg("不是管理员不能修改品类");
         }
-        return iCaregoryService.updateCategory(categoryName,categoryId);
+        return iCategoryService.updateCategory(categoryName,categoryId);
     }
 
     @RequestMapping(value = "getParallelChildrenCategory.do",method = RequestMethod.GET)
@@ -64,7 +64,7 @@ public class CategoryController {
         if(user.getRole() != Role.ADMIN.getCode()){
             return ResponseContent.createByErrorWithMsg("不是管理员不能搜索品类");
         }
-        return iCaregoryService.getParallelChildrenCategory(parentId);
+        return iCategoryService.getParallelChildrenCategory(parentId);
     }
 
     @RequestMapping(value = "getAllChildrenCategory.do",method = RequestMethod.GET)
@@ -77,6 +77,6 @@ public class CategoryController {
         if(user.getRole() != Role.ADMIN.getCode()){
             return ResponseContent.createByErrorWithMsg("不是管理员不能获取品类");
         }
-        return iCaregoryService.getAllChildrenCategory(parentId);
+        return iCategoryService.getAllChildrenCategory(parentId);
     }
 }

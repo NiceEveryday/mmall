@@ -2,20 +2,22 @@ package com.mmall.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.mmall.common.Const;
 import com.mmall.common.ResponseContent;
 import com.mmall.common.ReturnCode;
 import com.mmall.dao.CategoryMapper;
 import com.mmall.dao.ProductMapper;
 import com.mmall.pojo.Category;
 import com.mmall.pojo.Product;
+import com.mmall.service.ICategoryService;
 import com.mmall.service.IProductService;
 import com.mmall.util.DateUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.ProductDetailVO;
 import com.mmall.vo.ProductListVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,8 @@ public class IProductServiceImpl implements IProductService {
     private ProductMapper productMapper;
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private ICategoryService iCategoryService;
 
     public ResponseContent<String> saveOrUpdateProduct(Product product){
           if(product == null){
@@ -66,13 +70,16 @@ public class IProductServiceImpl implements IProductService {
         return ResponseContent.createByErrorWithMsg("更新商品状态失败，服务器内部错误请重试");
     }
 
-    public ResponseContent<ProductDetailVO> detail(Integer productId) {
+    public ResponseContent<ProductDetailVO> detail(Integer productId,boolean isFront) {
         if (productId == null) {
               return  ResponseContent.createByErrorWithCM(ReturnCode.PARAM_ERROR.getCode(),"参数不存在");
         }
         Product product = productMapper.selectByPrimaryKey(productId);
         if(product == null){
             return ResponseContent.createByErrorWithMsg("商品不存在");
+        }
+        if(isFront && product.getStatus() == 0){
+            return ResponseContent.createByErrorWithMsg("商品已下架");
         }
         return ResponseContent.createBySuccessWithData(this.productToProductDetailVO(product));
     }
@@ -137,6 +144,39 @@ public class IProductServiceImpl implements IProductService {
             productListVO.add(productToProductListVO(product));
         }
         PageInfo pageInfo = new PageInfo(productListVO);
+        return ResponseContent.createBySuccessWithData(pageInfo);
+    }
+
+    public ResponseContent<PageInfo>  listFront(Integer categoryId,String keyword,Integer pageNum,Integer pageSize,String orderBy){
+        if(categoryId == null && keyword == null){
+            return ResponseContent.createByErrorWithCM(ReturnCode.PARAM_ERROR.getCode(),ReturnCode.PARAM_ERROR.getDesc());
+        }
+        List<Integer> list = new ArrayList();
+        if(categoryId != null){
+            Category category = categoryMapper.selectByPrimaryKey(categoryId);
+            if(category == null && StringUtils.isBlank(keyword)){
+                return ResponseContent.createBySuccessWithMD("数据库中未找到数据",new PageInfo());
+            }
+            List<Category> listTmp =  iCategoryService.getAllChildrenCategory(categoryId).getData();
+            for(Category categoryTmp : listTmp){
+                list.add(categoryTmp.getId());
+            }
+        }
+
+        PageHelper.startPage(pageNum,pageSize);
+
+        if(StringUtils.isNoneBlank(orderBy)){
+            if(Const.OrderBy.setOrderBy.contains(orderBy)){
+                String[] strings = orderBy.split("_");
+                PageHelper.orderBy(strings[0] + " " + strings[1]);
+            }
+        }
+
+
+        List<Product> productList = productMapper.selectByCategoryIdAndKeyword(
+                StringUtils.isBlank(keyword)?null:keyword,
+                list.size()==0?null:list, Const.ProductStatus.ON_SALE.getStatus());
+        PageInfo pageInfo = new PageInfo(productList);
         return ResponseContent.createBySuccessWithData(pageInfo);
     }
 }

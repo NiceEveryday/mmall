@@ -3,7 +3,7 @@ package com.mmall.service.impl;
 import com.mmall.common.ResponseContent;
 import com.mmall.dao.CategoryMapper;
 import com.mmall.pojo.Category;
-import com.mmall.service.ICaregoryService;
+import com.mmall.service.ICategoryService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,8 +11,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
-@Service("iCaregoryService")
-public class ICategoryServiceImpl implements ICaregoryService {
+@Service("iCategoryService")
+public class ICategoryServiceImpl implements ICategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
