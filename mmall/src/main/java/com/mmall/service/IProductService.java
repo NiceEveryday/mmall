@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.mmall.common.ResponseContent;
 import com.mmall.pojo.Product;
 import com.mmall.vo.ProductDetailVO;
+import com.mmall.vo.ShippingVO;
 
 public interface IProductService {
     ResponseContent<String> saveOrUpdateProduct(Product product);
@@ -12,4 +13,5 @@ public interface IProductService {
     ResponseContent<PageInfo> list(Integer pageNum, Integer pageSize);
     ResponseContent<PageInfo>  search(String productName,Integer productId,int pageNum,int pageSize);
     ResponseContent<PageInfo>  listFront(Integer categoryId,String keyword,Integer pageNum,Integer pageSize,String orderBy);
+
 }

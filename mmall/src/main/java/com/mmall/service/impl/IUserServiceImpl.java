@@ -36,7 +36,7 @@ public class IUserServiceImpl implements IUserService {
     @Override
     public ResponseContent<String> checkValid(String infomation, int flag) {
         if(StringUtils.isBlank(infomation)){
-            return ResponseContent.createByErrorWithMsg("参数为空");
+            return ResponseContent.createByErrorWithCM(ReturnCode.PARAM_ERROR.getCode(),ReturnCode.PARAM_ERROR.getDesc());
         }
         int count = 0;
         if(flag == FlagInfomation.USERNAME.getCode()){
